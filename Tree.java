@@ -87,6 +87,80 @@ public class Tree<T extends Comparable<T>> {
       }
    }
 
+   public void insertNodes(T[] values) {
+      for (T value : values) {
+         this.insertNode(value);
+      }
+   }
+
+   public TreeNode<T> remove(T value) {
+      Tree<T> subTree = new Tree<>(this.root);
+      TreeNode<T> current = subTree.getRoot();
+      T targetValue = value;
+      int lastResult = 0;
+
+      while (current != null) {
+         int targetCurrentResult = targetValue.compareTo(current.data);
+
+         switch (targetCurrentResult) {
+            case 1:
+               subTree = new Tree<>(current);
+               current = current.rightNode;
+               break;
+            case -1:
+               subTree = new Tree<>(current);
+               current = current.leftNode;
+               break;
+            case 0:
+               if (current.rightNode == null && current.leftNode == null) {
+                  replaceValue(subTree, null, lastResult);
+                  return current;
+
+               } else if (current.rightNode == null && current.leftNode != null) {
+                  replaceValue(subTree, current.leftNode, lastResult);
+                  return current;
+
+               } else if (current.leftNode == null && current.rightNode != null) {
+                  replaceValue(subTree, current.rightNode, lastResult);
+                  return current;
+
+               } else {
+                  T minValue = getMin(current.rightNode);
+                  current.data = minValue;
+                  subTree = new Tree<>(current);
+                  current = current.rightNode;
+                  targetValue = minValue;
+               }
+         }
+         lastResult = targetCurrentResult;
+      }
+
+      return current;
+   }
+
+   public void replaceValue(Tree<T> subTree, TreeNode<T> replacement, int direction) {
+      if (direction == -1) {
+         subTree.getRoot().leftNode = replacement;
+      } else {
+         subTree.getRoot().rightNode = replacement;
+      }
+
+   }
+
+   public TreeNode<T> getRoot() {
+      return this.root;
+   }
+
+   public T getMin(TreeNode<T> root) {
+      TreeNode<T> current = root;
+
+      while (current.leftNode != null) {
+         current = current.leftNode;
+      }
+
+      return current.data;
+   }
+
    public Tree<T> search(T value) {
       TreeNode<T> current = root;
 

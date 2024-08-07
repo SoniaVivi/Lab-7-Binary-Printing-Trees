@@ -5,25 +5,10 @@
 
 public class TreeTest {
   public static void main(String[] args) {
+    Integer[] values = {5000, 4000, 6000, 3000, 4500, 5500, 7000, 2000,3500,
+                        4250, 4501, 5250, 5750, 6500, 8000};
     Tree<Integer> binaryTree = new Tree<>();
-    binaryTree.insertNode(5000);
-
-    binaryTree.insertNode(4000);
-    binaryTree.insertNode(6000);
-
-    binaryTree.insertNode(3000);
-    binaryTree.insertNode(4500);
-    binaryTree.insertNode(5500);
-    binaryTree.insertNode(7000);
-
-    binaryTree.insertNode(2000);
-    binaryTree.insertNode(3500);
-    binaryTree.insertNode(4250);
-    binaryTree.insertNode(4501);
-    binaryTree.insertNode(5250);
-    binaryTree.insertNode(5750);
-    binaryTree.insertNode(6500);
-    binaryTree.insertNode(8000);
+    binaryTree.insertNodes(values);
 
     binaryTree.outputTree(3);
     System.out.println();
@@ -86,6 +71,30 @@ public class TreeTest {
     System.out.println();
     System.out.println("inorder");
     binaryTree.search(99999, "inorder");
+    binaryTree.outputTree(3);
+    System.out.println();
+    System.out.println();
+
+    binaryTree.remove(5000);
+    binaryTree.outputTree(3);
+    System.out.println();
+    System.out.println();
+
+    binaryTree.remove(3000);
+    binaryTree.outputTree(3);
+    System.out.println();
+    System.out.println();
+
+    binaryTree.remove(5500);
+    binaryTree.outputTree(3);
+    System.out.println();
+    System.out.println();
+
+    binaryTree.remove(5250);
+    binaryTree.outputTree(3);
+    System.out.println();
+    System.out.println();
+
 
   }
 }
