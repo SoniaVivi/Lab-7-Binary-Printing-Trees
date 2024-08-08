@@ -1,8 +1,27 @@
-// Exercise 21.25: Tree.java
-// TreeNode and Tree class declarations for a binary search tree.
+// Siona Vivian
+// 7/8/24
+// CS 143
+// Lab 7: Binary Printing Trees
+/*
+  The program is create a binary search tree and relevant methods.
+*/
+/* ================= FOR EXTRA CREDIT ==============
+                    Wrote the following methods iteratively:
+                    2 tree traversals (inorder, preorder)
+                    search
+                    remove
+                    insert
+                    getMin
 
-// class TreeNode definition
-
+*/
+/* SOURCES:
+  Provided files
+  Dietel
+  https://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html
+  https://www.w3schools.com/java/java_arraylist.asp
+  https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html#remove-int-
+  https://en.wikipedia.org/wiki/Tree_traversal
+*/
 import java.util.*;
 
 class TreeNode<T extends Comparable<T>> {
@@ -15,30 +34,6 @@ class TreeNode<T extends Comparable<T>> {
    public TreeNode(T nodeData) {
       data = nodeData;
       leftNode = rightNode = null; // node has no children
-   }
-
-   // locate insertion point and insert new node; ignore duplicate values
-   public void insert(T insertValue) {
-      // insert in left subtree
-      if (insertValue.compareTo(data) <0) {
-         // insert new TreeNode
-         if (leftNode == null) {
-            leftNode = new TreeNode<>(insertValue);
-         }
-         else { // continue traversing left subtree recursively
-            leftNode.insert(insertValue);
-         }
-      }
-      // insert in right subtree
-      else if (insertValue.compareTo(data)> 0) {
-         // insert new TreeNode
-         if (rightNode == null) {
-            rightNode = new TreeNode<>(insertValue);
-         }
-         else { // continue traversing right subtree recursively
-            rightNode.insert(insertValue);
-         }
-      }
    }
 }
 
@@ -66,6 +61,8 @@ public class Tree<T extends Comparable<T>> {
             int result = insertValue.compareTo(current.data);
 
             switch (result) {
+               // Continue along branch until the next child on that path is
+               // a null, upon which set it to the value to be inserted and return.
                case 1:
                   if (current.rightNode == null) {
                      current.rightNode = new TreeNode<>(insertValue);
@@ -94,6 +91,7 @@ public class Tree<T extends Comparable<T>> {
    }
 
    public TreeNode<T> remove(T value) {
+      // Parent needed to remove the current node and do multiple removals/swaps
       Tree<T> subTree = new Tree<>(this.root);
       TreeNode<T> current = subTree.getRoot();
       T targetValue = value;
@@ -103,41 +101,49 @@ public class Tree<T extends Comparable<T>> {
          int targetCurrentResult = targetValue.compareTo(current.data);
 
          switch (targetCurrentResult) {
+            // If value being searched is too big
             case 1:
                subTree = new Tree<>(current);
                current = current.rightNode;
                break;
+            // if value being search is too small
             case -1:
                subTree = new Tree<>(current);
                current = current.leftNode;
                break;
+            // Value found
             case 0:
+               // Replace with null if childless
                if (current.rightNode == null && current.leftNode == null) {
                   replaceValue(subTree, null, lastResult);
-                  return current;
-
+               // If it has only 1 child, replace it with that
                } else if (current.rightNode == null && current.leftNode != null) {
                   replaceValue(subTree, current.leftNode, lastResult);
-                  return current;
-
                } else if (current.leftNode == null && current.rightNode != null) {
                   replaceValue(subTree, current.rightNode, lastResult);
-                  return current;
-
+               // If it has both children, replace with min value, then search
+               // the subtree of the right branch and repeat until no removals
+               // needed
                } else {
                   T minValue = getMin(current.rightNode);
                   current.data = minValue;
                   subTree = new Tree<>(current);
                   current = current.rightNode;
                   targetValue = minValue;
+                  break;
                }
+
+               return current;
          }
+         // Figure out which child of the parent is the current node
          lastResult = targetCurrentResult;
       }
 
       return current;
    }
 
+   // Replace subtree root child with replacement value if having traversed once from
+   // the root
    public void replaceValue(Tree<T> subTree, TreeNode<T> replacement, int direction) {
       if (direction == -1) {
          subTree.getRoot().leftNode = replacement;
@@ -206,37 +212,20 @@ public class Tree<T extends Comparable<T>> {
       TreeNode<T> current = root;
 
       while (nodes.size() > 0 || current != null) {
+         // If it is a node, print current value and add children to arraylist
          if (current != null) {
             System.out.printf("%s ", current.data);
+            // Add right child to stack then traverse left child
             nodes.add(current.rightNode);
             current = current.leftNode;
+         // If it is null, remove the last node in stack, the most recent parent
+         // then set current to the next node to be iterated
          } else {
             current = nodes.remove(nodes.size() - 1);
          }
       }
 
 
-   }
-
-   // begin preorder traversal
-   public void recursivePreorderTraversal() {
-      preorderHelper(root);
-   }
-
-   // recursive method to perform preorder traversal
-   private void preorderHelper(TreeNode<T> node) {
-      if (node == null) {
-         return;
-      }
-
-      System.out.printf("%s ", node.data); // output node data
-      preorderHelper(node.leftNode); // traverse left subtree
-      preorderHelper(node.rightNode); // traverse right subtree
-   }
-
-   // begin inorder traversal
-   public void recursiveInorderTraversal() {
-      inorderHelper(root);
    }
 
    public void inorderTraversal() {
@@ -244,9 +233,12 @@ public class Tree<T extends Comparable<T>> {
       TreeNode<T> current = root;
 
       while (nodes.size() > 0 || current != null) {
+         // If current is a node, add to queue then traverse left branch
          if (current != null) {
             nodes.add(current);
             current = current.leftNode;
+         // Upon hitting a dead end, remove and print
+         // most recent parent traverse right branch
          } else {
             current = nodes.remove(nodes.size() - 1);
             System.out.printf("%s ", current.data);
@@ -254,17 +246,6 @@ public class Tree<T extends Comparable<T>> {
          }
       }
 
-   }
-
-   // recursive method to perform inorder traversal
-   private void inorderHelper(TreeNode<T> node) {
-      if (node == null) {
-         return;
-      }
-
-      inorderHelper(node.leftNode); // traverse left subtree
-      System.out.printf("%s ", node.data); // output node data
-      inorderHelper(node.rightNode); // traverse right subtree
    }
 
    // begin postorder traversal
